@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.kuit.kuit4serverauth.exception.CustomException;
+import com.kuit.kuit4serverauth.exception.ErrorCode;
 
 @RestController
 public class UserController {
@@ -13,7 +15,7 @@ public class UserController {
     public ResponseEntity<String> getProfile(HttpServletRequest request) {
         // TODO : 로그인 한 사용자면 username 이용해 "Hello, {username}" 반환하기
         String username = (String) request.getAttribute("username");
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        return ResponseEntity.ok("Hello, " + username);
     }
 
     @GetMapping("/admin")
@@ -23,6 +25,6 @@ public class UserController {
         if (!"ROLE_ADMIN".equals(role)) {
             throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
         }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Forbidden");
+        return ResponseEntity.ok("Hello, admin");
     }
 }
