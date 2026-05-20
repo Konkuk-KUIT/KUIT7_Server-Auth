@@ -13,6 +13,6 @@ spring:
       path: /h2-console
 
 jwt:
-  secret: mysecretkey
+  secret: yourSuperSecureAndVeryLongSecretKeyForJWTAuthentication2026!!
   expiration: 3600000
 
