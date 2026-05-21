@@ -11,13 +11,20 @@ public class UserController {
 
     @GetMapping("/profile")
     public ResponseEntity<String> getProfile(HttpServletRequest request) {
-        // TODO : 로그인 한 사용자면 username 이용해 "Hello, {username}" 반환하기
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        // 인터셉터에서 검증된 username을 request 속성에서 가져옴
+        String username = (String) request.getAttribute("username");
+        return ResponseEntity.ok("Hello, " + username);
     }
 
     @GetMapping("/admin")
     public ResponseEntity<String> getAdmin(HttpServletRequest request) {
-        // TODO: role이 admin이면 "Hello, admin" 반환하기
+        // 인터셉터에서 검증된 role을 request 속성에서 가져옴
+        String role = (String) request.getAttribute("role");
+        
+        // ROLE_ADMIN 권한 확인
+        if ("ROLE_ADMIN".equals(role)) {
+            return ResponseEntity.ok("Hello, admin");
+        }
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Forbidden");
     }
 }
