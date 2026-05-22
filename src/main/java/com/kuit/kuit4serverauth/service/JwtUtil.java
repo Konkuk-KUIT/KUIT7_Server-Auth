@@ -13,6 +13,7 @@ import java.util.Date;
 public class JwtUtil {
     private final String secret = "mysecretkey";
     private final long expirationMs = 3600000; // 1 hour
+    private final long refreshExpirationMs = 1209600000L; // 2주
 
     public String generateToken(String username, String role) {
         return Jwts.builder()
@@ -34,4 +35,19 @@ public class JwtUtil {
             throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
     }
+
+    public String generateRefreshToken(String username){
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + refreshExpirationMs))
+                .signWith(SignatureAlgorithm.HS256, secret)
+                .compact();
+    }
+
+
+
+
+
+
 }
