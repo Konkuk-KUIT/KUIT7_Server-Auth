@@ -16,6 +16,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {
+        ex.printStackTrace();
+
         ErrorResponse errorResponse = new ErrorResponse(
                 ErrorCode.INTERNAL_SERVER_ERROR.getStatus(),
                 ErrorCode.INTERNAL_SERVER_ERROR.getMessage());
