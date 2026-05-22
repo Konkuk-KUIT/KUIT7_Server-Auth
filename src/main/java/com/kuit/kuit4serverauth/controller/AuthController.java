@@ -19,7 +19,7 @@ import java.util.Map;
 public class AuthController {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
-    private final RefreshTokenRepository refreshTokenRepository
+    private final RefreshTokenRepository refreshTokenRepository;
 
     public AuthController(UserRepository userRepository, JwtUtil jwtUtil, RefreshTokenRepository refreshTokenRepository) {
         this.userRepository = userRepository;
