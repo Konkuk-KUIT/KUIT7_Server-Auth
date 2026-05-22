@@ -34,10 +34,33 @@ public class AuthController {
             throw new CustomException(ErrorCode.INVALID_USERNAME_OR_PASSWORD);
         }
 
-        String token = jwtUtil.generateToken(user.getUsername(), user.getRole());
+        String accessToken = jwtUtil.generateToken(user.getUsername(), user.getRole());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUsername());
+        userRepository.updateRefreshToken(user.getUsername(), refreshToken);
+
         Map<String, String> response = new HashMap<>();
-        response.put("token", token);
+        response.put("accessToken", accessToken);
+        response.put("refreshToken", refreshToken);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<Map<String, String>> refresh(@RequestBody Map<String, String> body) {
+        String refreshToken = body.get("refreshToken");
+
+        // 토큰 서명/만료 검증
+        jwtUtil.validateRefreshToken(refreshToken);
+
+        // DB에 저장된 refreshToken과 일치하는지 확인
+        User user = userRepository.findByRefreshToken(refreshToken);
+        if (user == null) {
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        String newAccessToken = jwtUtil.generateToken(user.getUsername(), user.getRole());
+
+        Map<String, String> response = new HashMap<>();
+        response.put("accessToken", newAccessToken);
         return ResponseEntity.ok(response);
     }
 }
-

@@ -11,8 +11,9 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
-    private final String secret = "mysecretkey";
-    private final long expirationMs = 3600000; // 1 hour
+    private final String secret = "mysecretkey-kuit7-server-auth-2024-spring-boot";
+    private final long expirationMs = 3600000;          // 1시간
+    private final long refreshExpirationMs = 604800000; // 7일
 
     public String generateToken(String username, String role) {
         return Jwts.builder()
@@ -20,18 +21,38 @@ public class JwtUtil {
                 .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
-                .signWith(SignatureAlgorithm.HS256, secret)
+                .signWith(SignatureAlgorithm.HS256, secret.getBytes())
+                .compact();
+    }
+
+    public String generateRefreshToken(String username) {
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + refreshExpirationMs))
+                .signWith(SignatureAlgorithm.HS256, secret.getBytes())
                 .compact();
     }
 
     public Claims validateToken(String token) {
         try {
             return Jwts.parser()
-                    .setSigningKey(secret)
+                    .setSigningKey(secret.getBytes())
                     .parseClaimsJws(token)
                     .getBody();
         } catch (Exception e) {
             throw new CustomException(ErrorCode.INVALID_TOKEN);
+        }
+    }
+
+    public Claims validateRefreshToken(String token) {
+        try {
+            return Jwts.parser()
+                    .setSigningKey(secret)
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
     }
 }
