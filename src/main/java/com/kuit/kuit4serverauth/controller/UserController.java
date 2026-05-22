@@ -1,7 +1,9 @@
 package com.kuit.kuit4serverauth.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpStatus;
+import com.kuit.kuit4serverauth.exception.CustomException;
+import com.kuit.kuit4serverauth.exception.ErrorCode;
+import com.kuit.kuit4serverauth.resolver.AuthUser;
+import com.kuit.kuit4serverauth.resolver.LoginUser;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -9,15 +11,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserController {
 
+    private static final String ROLE_ADMIN = "ROLE_ADMIN";
+
     @GetMapping("/profile")
-    public ResponseEntity<String> getProfile(HttpServletRequest request) {
-        // TODO : 로그인 한 사용자면 username 이용해 "Hello, {username}" 반환하기
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+    public ResponseEntity<String> getProfile(@LoginUser AuthUser user) {
+        return ResponseEntity.ok("Hello, " + user.getUsername());
     }
 
     @GetMapping("/admin")
-    public ResponseEntity<String> getAdmin(HttpServletRequest request) {
-        // TODO: role이 admin이면 "Hello, admin" 반환하기
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Forbidden");
+    public ResponseEntity<String> getAdmin(@LoginUser AuthUser user) {
+        if (!ROLE_ADMIN.equals(user.getRole())) {
+            throw new CustomException(ErrorCode.FORBIDDEN_ACCESS);
+        }
+        return ResponseEntity.ok("Hello, admin");
     }
 }
