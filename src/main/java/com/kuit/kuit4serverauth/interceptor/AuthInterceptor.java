@@ -18,16 +18,18 @@ public class AuthInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            Claims claims = jwtUtil.validateToken(token);
-            request.setAttribute("username", claims.getSubject());
-            request.setAttribute("role", claims.get("role"));
-            return true;
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new CustomException(ErrorCode.MISSING_AUTH_HEADER);
         }
-        throw new CustomException(ErrorCode.MISSING_AUTH_HEADER);
+
+        String token = authHeader.substring(7);
+        Claims claims = jwtUtil.validateToken(token);
+
+        request.setAttribute("userId", jwtUtil.getUserId(claims));
+        request.setAttribute("username", claims.getSubject());
+        request.setAttribute("role", claims.get("role", String.class));
+        return true;
     }
 }
-
