@@ -5,13 +5,17 @@ import com.kuit.kuit4serverauth.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
+import java.security.Key;
 import java.util.Date;
 
 @Component
 public class JwtUtil {
-    private final String secret = "mysecretkey";
+    private final Key secretKey = Keys.hmacShaKeyFor(
+            "mysecretkeymysecretkeymysecretkey123".getBytes()
+    );
     private final long expirationMs = 3600000; // 1 hour
 
     public String generateToken(String username, String role) {
@@ -20,14 +24,15 @@ public class JwtUtil {
                 .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
-                .signWith(SignatureAlgorithm.HS256, secret)
+                .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public Claims validateToken(String token) {
         try {
-            return Jwts.parser()
-                    .setSigningKey(secret)
+            return Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
                     .parseClaimsJws(token)
                     .getBody();
         } catch (Exception e) {
