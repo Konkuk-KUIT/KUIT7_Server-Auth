@@ -5,7 +5,8 @@ public enum ErrorCode {
     INVALID_TOKEN(401, "Invalid or expired token"),
     MISSING_AUTH_HEADER(401, "Missing or invalid Authorization header"),
     FORBIDDEN_ACCESS(403, "Access denied"),
-    INTERNAL_SERVER_ERROR(500, "Internal server error");
+    INTERNAL_SERVER_ERROR(500, "Internal server error"),
+    EXPIRED_TOKEN(401, "Token has been expired.");
 
     private final int status;
     private final String message;
