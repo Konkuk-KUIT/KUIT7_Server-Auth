@@ -7,12 +7,15 @@ spring:
     driver-class-name: org.h2.Driver
     username: sa
     password: password
+  sql:
+    init:
+      mode: always
   h2:
     console:
       enabled: true
       path: /h2-console
 
 jwt:
-  secret: mysecretkey
+  secret: abcdefghijklmnopqrstuvwxyz1234567890ABCD
   expiration: 3600000
 
