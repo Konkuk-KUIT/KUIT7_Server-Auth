@@ -23,6 +23,9 @@ public class AuthInterceptor implements HandlerInterceptor {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             Claims claims = jwtUtil.validateToken(token);
+            if (!"access".equals(claims.get("type", String.class))) {
+                throw new CustomException(ErrorCode.INVALID_TOKEN);
+            }
             request.setAttribute("username", claims.getSubject());
             request.setAttribute("role", claims.get("role"));
             return true;

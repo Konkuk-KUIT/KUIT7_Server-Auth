@@ -11,13 +11,27 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
-    private final String secret = "myverylongsecretkeyforjwtauthenticationsystemthatisverysecure"; // 64바이트 이상
-    private final long expirationMs = 3600000; // 1 hour
+    private final String secret = "myverylongsecretkeyforjwtauthenticationsystemthatisverysecure";
+    private final long accessTokenExpirationMs = 3600000;
+    private final long refreshTokenExpirationMs = 1209600000;
 
     public String generateToken(String username, String role) {
+        return generateAccessToken(username, role);
+    }
+
+    public String generateAccessToken(String username, String role) {
+        return generateToken(username, role, "access", accessTokenExpirationMs);
+    }
+
+    public String generateRefreshToken(String username, String role) {
+        return generateToken(username, role, "refresh", refreshTokenExpirationMs);
+    }
+
+    private String generateToken(String username, String role, String type, long expirationMs) {
         return Jwts.builder()
                 .setSubject(username)
                 .claim("role", role)
+                .claim("type", type)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(SignatureAlgorithm.HS256, secret)
@@ -33,5 +47,13 @@ public class JwtUtil {
         } catch (Exception e) {
             throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
+    }
+
+    public Claims validateRefreshToken(String token) {
+        Claims claims = validateToken(token);
+        if (!"refresh".equals(claims.get("type", String.class))) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
+        }
+        return claims;
     }
 }
