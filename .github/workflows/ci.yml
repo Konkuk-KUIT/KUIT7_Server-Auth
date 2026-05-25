@@ -1,0 +1,49 @@
+# 1. 워크플로우(자동화 파이프라인)의 이름을 지정. 깃허브 Actions 탭에 이 이름으로 표시
+name: Java CI with Gradle
+
+# 2. 이 트리거 조건이 충족될 때 가상 컴퓨터 가동
+on:
+  push:
+    # main 브랜치나 내 작업 브랜치(newdhkim)에 push가 들어오면 이 자동화 실행
+    branches: [ "main", "newdhkim" ]
+  pull_request:
+    # 누군가 main 브랜치로 Pull Request(PR)를 날려도 검증을 위해 실행
+    branches: [ "main" ]
+
+# 3. 이 워크플로우가 깃허브 저장소의 코드(Contents)를 읽을 수 있는 권한 부여
+permissions:
+  contents: read
+
+# 4. 실제로 가상 컴퓨터가 수행할 작업(들) 정의
+jobs:
+  # 'build'라는 이름의 단일 작업 정의
+  build:
+    # 깃허브가 제공하는 클라우드 가상 컴퓨터 중 최신 우분투 리눅스(ubuntu-latest)를 빌려서 실행
+    runs-on: ubuntu-latest
+
+    # 가상 컴퓨터 내부에서 순서대로 실행할 단계(Steps)들 지정
+    steps:
+
+      # [Step 1] 깃허브 저장소에 올라가 있는 내 소스 코드를 가상 컴퓨터 내부로 다운로드
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      # [Step 2] 가상 컴퓨터에 자바(JDK 17) 환경 설치
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'       # 우리가 사용하는 자바 버전 17 지정
+          distribution: 'temurin'   # 가장 안정적이고 널리 쓰이는 Temurin 배포판 사용
+
+      # [Step 3] 빌드 속도를 획기적으로 올리기 위해, 이전에 다운로드 받았던 의존성(라이브러리)들 캐싱
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      # [Step 4] 리눅스 환경에서 그라들 실행 파일(gradlew)을 작동시킬 수 있도록 파일 실행 권한(+x) 부여
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # [Step 5] 테스트 및 빌드(build) 수행
+      # --no-daemon 옵션을 주어 일회성 가상 컴퓨터에서 백그라운드 메모리 낭비 없이 깔끔하게 컴파일되도록 함
+      - name: Build with Gradle
+        run: ./gradlew clean build --no-daemon
