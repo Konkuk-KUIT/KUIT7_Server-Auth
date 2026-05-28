@@ -22,7 +22,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            Claims claims = jwtUtil.validateToken(token);
+            Claims claims = jwtUtil.validateAccessToken(token);
             request.setAttribute("username", claims.getSubject());
             request.setAttribute("role", claims.get("role"));
             return true;
@@ -30,4 +30,3 @@ public class AuthInterceptor implements HandlerInterceptor {
         throw new CustomException(ErrorCode.MISSING_AUTH_HEADER);
     }
 }
-
