@@ -3,6 +3,8 @@ package com.kuit.kuit4serverauth.exception;
 public enum ErrorCode {
     INVALID_USERNAME_OR_PASSWORD(401, "Invalid username or password"),
     INVALID_TOKEN(401, "Invalid or expired token"),
+    EXPIRED_TOKEN(401, "Expired token"),
+    INVALID_REFRESH_TOKEN(401, "Invalid refresh token"),
     MISSING_AUTH_HEADER(401, "Missing or invalid Authorization header"),
     FORBIDDEN_ACCESS(403, "Access denied"),
     INTERNAL_SERVER_ERROR(500, "Internal server error");
