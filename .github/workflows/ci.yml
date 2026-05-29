@@ -1,0 +1,31 @@
+name: CI
+
+# 코드를 push 하거나 PR을 올릴 때마다 자동 실행
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 저장소 코드 내려받기
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. JDK 17 설치 (+ Gradle 의존성 캐싱으로 빌드 속도 향상)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      # 3. gradlew 실행 권한 부여 (리눅스 러너에서 필요)
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # 4. 빌드 + 테스트 (build 태스크가 test 까지 함께 실행)
+      - name: Build with Gradle
+        run: ./gradlew build
