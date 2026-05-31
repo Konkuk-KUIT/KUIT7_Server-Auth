@@ -16,5 +16,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // TODO /profile, /admin 앞에 붙이기
+        // 지정된 경로(/profile, /admin)로 요청이 올 때만 authInterceptor가 작동하도록 설정
+        registry.addInterceptor(authInterceptor)
+                .addPathPatterns("/profile", "/admin");
     }
 }
